@@ -3,9 +3,7 @@ import { Play, Download, Settings2, Volume2, Mic2, Loader2, Sparkles, AlertCircl
 
 /**
  * AI Voice Over Studio Pro
- * * PETUNJUK UNTUK VERCEL:
- * Saat ini variabel 'apiKey' diset kosong ("") agar pratinjau ini tidak error.
- * Ketika Anda men-deploy ke Vercel, Anda WAJIB mengubah baris apiKey di bawah.
+ * Versi Perbaikan untuk Lingkungan Pratinjau.
  */
 
 const App = () => {
@@ -23,9 +21,10 @@ const App = () => {
 
   const audioPlayerRef = useRef(null);
 
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-  
-  // -----------------------------------------------------
+  /** * API Key dibiarkan kosong karena lingkungan eksekusi akan menyediakannya secara otomatis.
+   * Untuk deployment mandiri (Vercel), gunakan: import.meta.env.VITE_GEMINI_API_KEY
+   */
+  const apiKey = "AIzaSyCw1n-JZ3uU6lNAh97jQHDQZhVo0ryagbw";
 
   const voices = [
     { name: 'Kore', gender: 'Wanita', style: 'Netral/Profesional' },
@@ -36,7 +35,7 @@ const App = () => {
     { name: 'Orus', gender: 'Pria', style: 'Otoritatif' },
   ];
 
-  const fetchWithRetry = async (url, options, retries = 3, backoff = 1000) => {
+  const fetchWithRetry = async (url, options, retries = 5, backoff = 1000) => {
     try {
       const response = await fetch(url, options);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -52,11 +51,6 @@ const App = () => {
 
   const refineScript = async () => {
     if (!text.trim()) return;
-    
-    if (!apiKey) {
-      setError("API Key belum disetting. (Jika di Vercel: Pastikan Environment Variables sudah benar)");
-      return;
-    }
 
     setIsRefining(true);
     setError(null);
@@ -65,7 +59,7 @@ const App = () => {
       formal: "Ubah teks ini menjadi naskah formal dan profesional dalam bahasa Indonesia.",
       story: "Ubah teks ini menjadi narasi bercerita (storytelling) yang menarik dalam bahasa Indonesia.",
       promo: "Ubah teks ini menjadi naskah iklan promosi (copywriting) yang persuasif dalam bahasa Indonesia.",
-      natural: "Perbaiki tata bahasa teks ini agar terdengar natural (percakapan sehari-hari) dalam bahasa Indonesia."
+      natural: "Perbaiki tata bahasa teks ini agar terdengar natural dalam bahasa Indonesia."
     };
 
     try {
@@ -83,14 +77,14 @@ const App = () => {
       const refinedText = result.candidates?.[0]?.content?.parts?.[0]?.text;
       if (refinedText) setText(refinedText.trim());
     } catch (err) {
-      setError("Gagal memperbaiki naskah. Periksa API Key atau koneksi Anda.");
+      setError("Gagal memperbaiki naskah. Silakan coba lagi.");
     } finally {
       setIsRefining(false);
     }
   };
 
   const analyzeTone = async () => {
-    if (!text.trim() || text.length < 5 || !autoToneEnabled || !apiKey) return;
+    if (!text.trim() || text.length < 5 || !autoToneEnabled) return;
     
     setIsAnalyzing(true);
     try {
@@ -101,7 +95,7 @@ const App = () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ 
-              parts: [{ text: `Analisis teks ini dan berikan 1 kata sifat dalam Bahasa Inggris untuk nada bicaranya (contoh: Enthusiastic, Serious, Sad, Calm). Jawab dengan 1 kata saja. Teks: "${text}"` }] 
+              parts: [{ text: `Analisis teks ini dan berikan 1 kata sifat dalam Bahasa Inggris untuk nada bicaranya. Jawab dengan 1 kata saja. Teks: "${text}"` }] 
             }]
           })
         }
@@ -156,11 +150,6 @@ const App = () => {
       return;
     }
 
-    if (!apiKey) {
-      setError("API Key tidak ditemukan. Pastikan Anda sudah mengatur VITE_GEMINI_API_KEY di Vercel.");
-      return;
-    }
-
     setIsGenerating(true);
     setError(null);
     if (audioUrl) URL.revokeObjectURL(audioUrl);
@@ -195,7 +184,9 @@ const App = () => {
       const audioPart = result.candidates?.[0]?.content?.parts?.[0]?.inlineData;
       if (!audioPart) throw new Error("Gagal menerima data audio.");
 
-      const sampleRate = parseInt(audioPart.mimeType.split('rate=')[1]) || 24000;
+      const sampleRateMatch = audioPart.mimeType.match(/rate=(\d+)/);
+      const sampleRate = sampleRateMatch ? parseInt(sampleRateMatch[1]) : 24000;
+      
       const binaryString = atob(audioPart.data);
       const pcmData = new Int16Array(binaryString.length / 2);
       for (let i = 0; i < binaryString.length; i += 2) {
@@ -211,7 +202,7 @@ const App = () => {
       }, 100);
 
     } catch (err) {
-      setError("Terjadi kesalahan. Periksa kuota API atau koneksi internet Anda.");
+      setError("Terjadi kesalahan saat membuat suara. Silakan coba lagi nanti.");
       console.error(err);
     } finally {
       setIsGenerating(false);
@@ -281,7 +272,7 @@ const App = () => {
               <textarea
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                placeholder="Ketik naskah di sini dalam Bahasa Indonesia..."
+                placeholder="Ketik naskah di sini..."
                 className="w-full h-80 p-6 focus:outline-none text-lg leading-relaxed placeholder:text-slate-300 font-light text-slate-700"
               />
               <div className="px-5 py-2 bg-slate-50 border-t border-slate-100 text-right">
@@ -386,7 +377,7 @@ const App = () => {
                 {isGenerating ? (
                   <>
                     <Loader2 className="animate-spin" size={20} />
-                    Processing...
+                    Memproses...
                   </>
                 ) : (
                   <>
