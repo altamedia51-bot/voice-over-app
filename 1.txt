@@ -1,0 +1,14 @@
+ai-voice-studio/
+├── public/
+│   └── (biarkan kosong atau isi favicon jika ada)
+├── src/
+│   ├── App.jsx          (Isi dengan kode App.jsx terakhir)
+│   ├── main.jsx         (Isi dengan kode main.jsx)
+│   ├── index.css        (Isi dengan kode index.css)
+│   └── (aset lain jika ada)
+├── .gitignore           (PENTING: Buat file ini, lihat isi di bawah)
+├── index.html           (Isi dengan kode index.html)
+├── package.json         (Isi dengan kode package.json)
+├── tailwind.config.js   (Isi dengan kode tailwind.config.js)
+├── postcss.config.js    (Opsional, tapi sebaiknya ada. Lihat isi di bawah)
+└── vite.config.js       (Isi dengan kode vite.config.js)
