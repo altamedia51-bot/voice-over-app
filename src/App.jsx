@@ -3,7 +3,7 @@ import { Play, Download, Settings2, Volume2, Mic2, Loader2, Sparkles, AlertCircl
 
 /**
  * AI Voice Over Studio Pro
- * Versi Perbaikan untuk Lingkungan Pratinjau.
+ * Versi Perbaikan untuk Lingkungan Pratinjau dengan Fitur Favicon Otomatis.
  */
 
 const App = () => {
@@ -25,6 +25,17 @@ const App = () => {
    * Untuk deployment mandiri (Vercel), gunakan: import.meta.env.VITE_GEMINI_API_KEY
    */
   const apiKey = "AIzaSyCw1n-JZ3uU6lNAh97jQHDQZhVo0ryagbw";
+
+  // Menambahkan favicon dan judul halaman secara dinamis
+  useEffect(() => {
+    document.title = "VO Studio Pro AI";
+    
+    // Membuat favicon menggunakan emoji mikrofon
+    const link = document.querySelector("link[rel~='icon']") || document.createElement('link');
+    link.rel = 'icon';
+    link.href = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎙️</text></svg>';
+    document.getElementsByTagName('head')[0].appendChild(link);
+  }, []);
 
   const voices = [
     { name: 'Kore', gender: 'Wanita', style: 'Netral/Profesional' },
